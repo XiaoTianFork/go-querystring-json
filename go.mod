@@ -1,4 +1,4 @@
-module github.com/XiaoTianFork/go-querystring-json
+module github.com/xiaotianfork/go-querystring-json
 
 go 1.10
 
