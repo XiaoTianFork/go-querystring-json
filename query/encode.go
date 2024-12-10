@@ -7,9 +7,9 @@
 // As a simple example:
 //
 //	type Options struct {
-//		Query   string `url:"q"`
-//		ShowAll bool   `url:"all"`
-//		Page    int    `url:"page"`
+//		Query   string `json:"q"`
+//		ShowAll bool   `json:"all"`
+//		Page    int    `json:"page"`
 //	}
 //
 //	opt := Options{ "foo", true, 2 }
@@ -55,23 +55,23 @@ type Encoder interface {
 // returns true for IsZero().
 //
 // The URL parameter name defaults to the struct field name but can be
-// specified in the struct field's tag value.  The "url" key in the struct
+// specified in the struct field's tag value.  The "json" key in the struct
 // field's tag value is the key name, followed by an optional comma and
 // options.  For example:
 //
 //	// Field is ignored by this package.
-//	Field int `url:"-"`
+//	Field int `json:"-"`
 //
 //	// Field appears as URL parameter "myName".
-//	Field int `url:"myName"`
+//	Field int `json:"myName"`
 //
 //	// Field appears as URL parameter "myName" and the field is omitted if
 //	// its value is empty
-//	Field int `url:"myName,omitempty"`
+//	Field int `json:"myName,omitempty"`
 //
 //	// Field appears as URL parameter "Field" (the default), but the field
 //	// is skipped if empty.  Note the leading comma.
-//	Field int `url:",omitempty"`
+//	Field int `json:",omitempty"`
 //
 // For encoding individual field values, the following type-dependent rules
 // apply:
@@ -85,7 +85,7 @@ type Encoder interface {
 // time.Unix()).  The "unixmilli" and "unixnano" options will encode the number
 // of milliseconds and nanoseconds, respectively, since January 1, 1970 (see
 // time.UnixNano()).  Including the "layout" struct tag (separate from the
-// "url" tag) will use the value of the "layout" tag as a layout passed to
+// "json" tag) will use the value of the "layout" tag as a layout passed to
 // time.Format.  For example:
 //
 //	// Encode a time.Time as YYYY-MM-DD
@@ -100,12 +100,12 @@ type Encoder interface {
 // have "[]" appended to the value name. "numbered" will append a number to
 // the end of each incidence of the value name, example:
 // name0=value0&name1=value1, etc.  Including the "del" struct tag (separate
-// from the "url" tag) will use the value of the "del" tag as the delimiter.
+// from the "json" tag) will use the value of the "del" tag as the delimiter.
 // For example:
 //
 //	// Encode a slice of bools as ints ("1" for true, "0" for false),
 //	// separated by exclamation points "!".
-//	Field []bool `url:",int" del:"!"`
+//	Field []bool `json:",int" del:"!"`
 //
 // Anonymous struct fields are usually encoded as if their inner exported
 // fields were fields in the outer struct, subject to the standard Go
@@ -159,7 +159,7 @@ func reflectValue(values url.Values, val reflect.Value, scope string) error {
 		}
 
 		sv := val.Field(i)
-		tag := sf.Tag.Get("url")
+		tag := sf.Tag.Get("json")
 		if tag == "-" {
 			continue
 		}
@@ -340,11 +340,11 @@ func isEmptyValue(v reflect.Value) bool {
 	return false
 }
 
-// tagOptions is the string following a comma in a struct field's "url" tag, or
+// tagOptions is the string following a comma in a struct field's "json" tag, or
 // the empty string. It does not include the leading comma.
 type tagOptions []string
 
-// parseTag splits a struct field's url tag into its name and comma-separated
+// parseTag splits a struct field's json tag into its name and comma-separated
 // options.
 func parseTag(tag string) (string, tagOptions) {
 	s := strings.Split(tag, ",")
